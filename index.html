@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Generative Digit Model</title>
+    <!-- 1. Load Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 2. Load TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <style>
+        /* A little extra style for the canvas */
+        canvas {
+            border: 2px solid #e2e8f0;
+            image-rendering: pixelated; /* Makes the 28x28 image sharp */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full">
+        <h1 class="text-2xl font-bold mb-4 text-gray-800">My C-VAE Digit Generator</h1>
+        <p class="text-gray-600 mb-6">Select a digit and click "Generate" to create a new, unique image using the model I trained!</p>
+
+        <!-- Canvas where the 28x28 image will be drawn -->
+        <canvas id="output-canvas" width="28" height="28" class="mx-auto mb-6 w-56 h-56 rounded-lg"></canvas>
+
+        <!-- Digit selection -->
+        <div class="mb-4">
+            <label for="digit-select" class="block text-sm font-medium text-gray-700 mb-2">Select a Digit (0-9):</label>
+            <select id="digit-select" class="p-2 border rounded-md">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+            </select>
+        </div>
+
+        <!-- Generate Button -->
+        <button id="generate-button" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300 w-full">
+            Loading Model...
+        </button>
+
+        <p id="status" class="text-gray-500 text-sm mt-4"></p>
+    </div>
+
+    <script>
+        // --- THIS IS THE ONLY LINE YOU NEED TO CHANGE ---
+        // I have updated this with your correct URL
+        const MODEL_URL = 'https://ayushpritam.github.io/digit-generator/model.json';
+        
+        // --- All the Web App Logic ---
+
+        const LATENT_DIM = 2; // Must match the 'LATENT_DIM' from your Python code!
+        const NUM_CLASSES = 10;
+        
+        const canvas = document.getElementById('output-canvas');
+        // --- FIX ---
+        // Was 'd2', corrected to '2d'
+        const ctx = canvas.getContext('2d');
+        const button = document.getElementById('generate-button');
+        const select = document.getElementById('digit-select');
+        const status = document.getElementById('status');
+        
+        let decoder; // This will hold our loaded model
+
+        // 1. Function to load the model
+        async function loadModel() {
+            status.innerText = "Loading model from " + MODEL_URL;
+            try {
+                // This is the magic line that loads your model!
+                decoder = await tf.loadLayersModel(MODEL_URL);
+                status.innerText = "Model loaded successfully!";
+                button.innerText = "Generate";
+                button.disabled = false;
+            } catch (err) {
+                console.error(err);
+                status.innerText = "Error loading model. Check console & URL.";
+            }
+        }
+
+        // 2. Function to generate a digit
+        async function generateDigit() {
+            if (!decoder) return;
+
+            button.innerText = "Generating...";
+            button.disabled = true;
+
+            // Get the digit the user selected
+            const digit = parseInt(select.value);
+
+            // Use tf.tidy to clean up memory automatically
+            tf.tidy(() => {
+                // --- Create the two inputs for the decoder ---
+
+                // Input 1: A random latent vector [1, LATENT_DIM]
+                // (This is the "idea" vector)
+                const latentVector = tf.randomNormal([1, LATENT_DIM]);
+
+                // Input 2: The one-hot encoded label [1, NUM_CLASSES]
+                // (This tells the model *which* digit to draw)
+                const label = tf.oneHot([digit], NUM_CLASSES);
+
+                // --- Run the prediction ---
+                // This is where the magic happens!
+                const generatedImageTensor = decoder.predict([latentVector, label]);
+
+                // Reshape the output (784) to an image (28, 28, 1)
+                const image = generatedImageTensor.reshape([28, 28, 1]);
+
+                // Draw the tensor onto the canvas
+                tf.browser.toPixels(image, canvas);
+            });
+
+            button.innerText = "Generate";
+            button.disabled = false;
+        }
+
+        // 3. Start everything
+        button.disabled = true;
+        button.addEventListener('click', generateDigit);
+        loadModel(); // Load the model as soon as the page opens
+    </script>
+</body>
+</html>
+
+
