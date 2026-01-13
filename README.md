@@ -1,12 +1,12 @@
-Handwritten Digit Generation using C-VAE
+**Handwritten Digit Generation using C-VAE**
 
-Introduction
+**Introduction**
 
 This project implements a Conditional Variational Autoencoder (C-VAE) to generate realistic handwritten digits. Unlike standard classifiers that simply recognize numbers, this Generative AI model learns the underlying probability distribution of the MNIST dataset to synthesize completely new digit samples.
 
 The model is built from scratch using TensorFlow/Keras and utilizes the "Reparameterization Trick" to sample from a continuous latent space, allowing for smooth interpolation between different digit styles.
 
-Features
+**Features**
 
 Generative Capability: Synthesizes novel 28x28 pixel grayscale images of digits (0-9).
 
@@ -16,7 +16,7 @@ Latent Space Visualization: detailed 2D visualization of the learned manifold, s
 
 Custom Training Loop: Implements a custom train_step in Keras to handle the specific KL-Divergence and Reconstruction losses required for VAEs.
 
-Tech Stack
+**Tech Stack**
 
 Language: Python 3
 
@@ -28,7 +28,7 @@ Visualization: Matplotlib, Graphviz (for architecture diagrams)
 
 Environment: Google Colab / Jupyter Notebook
 
-Dataset
+**Dataset**
 
 The project uses the MNIST Digit Dataset, which consists of:
 
@@ -38,8 +38,8 @@ Image Format: 28x28 grayscale pixels (flattened to 784 dimensions).
 
 Source: LeCun et al. (Loaded via Keras or CSV).
 
-Model Architecture
-
+**Model Architecture
+**
 The C-VAE consists of two main parts:
 
 Encoder: Compresses the input image and label into a latent distribution defined by a Mean ($\mu$) and Log-Variance ($\sigma$).
@@ -48,7 +48,7 @@ Decoder: Samples a point $z$ from this distribution (conditioned on the label) a
 
 Note: A detailed architecture diagram is generated within the notebook using Graphviz.
 
-Installation & Usage
+**Installation & Usage**
 
 Option 1: Google Colab (Recommended)
 
@@ -68,7 +68,7 @@ git clone [https://github.com/your-username/digit-generation-cvae.git](https://g
 cd digit-generation-cvae
 
 
-Install dependencies:
+**Install dependencies:**
 
 pip install tensorflow numpy pandas matplotlib graphviz
 
@@ -78,7 +78,7 @@ Run the script or notebook:
 jupyter notebook Digit_Generation.ipynb
 
 
-Results
+**Results**
 
 After training for 30+ epochs, the model is capable of:
 
@@ -87,7 +87,7 @@ Reconstruction: Accurately reproducing input images.
 Generation: Creating a 10x10 grid of digits sampled from the latent space.
 
 
-Contributing
+**Contributing**
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -101,7 +101,7 @@ Push to the branch (git push origin feature/AmazingFeature).
 
 Open a Pull Request.
 
-License
+**License**
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
